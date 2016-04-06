@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">BusTracker-ACG-Driver</string>
+
+    <!-- Google App ID-->
+    <string name="google_app_id">bustracker-acg-driver</string>
+
+    <!--  Images Descriptions -->
+    <string name="desc_splash_icon">Splash Image</string>
+    <string name="splash_secret_txt">Bus Tracker - Driver</string>
+
+
+
+    <!-- Confirm Route Dialog Fragment-->
+    <string name="confirm_route_question">Επιλέξατε Σωστά;</string>
+    <string name="yes_button">ΝΑΙ</string>
+    <string name="no_button">ΟΧΙ</string>
+
+</resources>

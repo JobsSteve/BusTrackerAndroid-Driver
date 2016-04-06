@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary">
+
+
+    <TextView
+        android:id="@+id/list_header_route"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/list_item_large_margin"
+        android:padding="@dimen/list_item_large_margin"
+        android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:text="Επιλέξτε διαδρομη"
+        android:textAlignment="center"
+        android:textSize="@dimen/list_item_large_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@drawable/rounded_view_select_route_header"/>
+
+</LinearLayout>

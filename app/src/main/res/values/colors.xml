@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#78A890</color>
+    <color name="colorPrimaryDark">#014347</color>
+    <color name="colorAccent">#E7D9B4</color>
+
+    <color name="colorAccentLight">#f1e8d2</color>
+
+    <color name="colorDrawerSelectedItem">#007fff</color>
+
+    <color name="colorNegative">#f16969</color>
+    <color name="colorNegativeDark">#ed3a3a</color>
+
+    <color name="colorPositive">#d7ffaf</color>
+    <color name="colorPositiveDark">#c3ff88</color>
+
+
+</resources>
