@@ -255,6 +255,13 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         Log.e(TAG, "onPause ========");
+
+        // Unregister the NetworkChangedReceiver
+        if (isReceiverRegistered) {
+            unregisterReceiver(mNetworkChangeReceiver);
+            mNetworkChangeReceiver = null;
+            isReceiverRegistered = false;
+        }
     }
 
     @Override
