@@ -8,11 +8,31 @@
     <string name="desc_splash_icon">Splash Image</string>
     <string name="splash_secret_txt">Bus Tracker - Driver</string>
 
-
-
     <!-- Confirm Route Dialog Fragment-->
     <string name="confirm_route_question">Επιλέξατε Σωστά;</string>
     <string name="yes_button">ΝΑΙ</string>
     <string name="no_button">ΟΧΙ</string>
+
+    <!-- GEOFENCING-->
+    <!-- Transition type strings -->
+    <string name="geofence_transition_entered">Entered</string>
+    <string name="geofence_transition_exited">Exited</string>
+    <string name="unknown_geofence_transition">Unknown Transition</string>
+
+    <!-- Error strings -->
+    <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
+    <string name="geofence_not_available">Geofence service is not available now</string>
+    <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
+    <string name="geofence_too_many_pending_intents">
+        You have provided too many PendingIntents to the addGeofences() call
+    </string>
+    <string name="unknown_geofence_error">
+        Unknown error: the Geofence service is not available now
+    </string>
+    <string name="geofence_transition_invalid_type">
+        Geofence transition error: invalid transition type %1$d
+    </string>
+    <string name="geofence_transition_notification_text">Click notification to return to app</string>
+
 
 </resources>

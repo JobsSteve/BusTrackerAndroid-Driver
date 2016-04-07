@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity implements
 
             if (routeID != 0){
                 // BackgroundUploadService - Keep tracking even the app is closed
-//                Intent service = new Intent(this, BackgroundUploadService.class);
-//                startService(service);
+                Intent service = new Intent(this, BackgroundUploadService.class);
+                startService(service);
             } else {
                 routeID = getSharedPreferences(SelectRouteActivity.PREFS_FILE, Activity.MODE_PRIVATE).getInt(SelectRouteActivity.ROUTE_ID, 0);
             }

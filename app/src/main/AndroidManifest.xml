@@ -78,6 +78,8 @@
             android:icon="@mipmap/ic_launcher"
             android:label="BackgroundUploadService" />
 
+        <service android:name=".GeofenceTransitionsIntentService" />
+
     </application>
 
 </manifest>

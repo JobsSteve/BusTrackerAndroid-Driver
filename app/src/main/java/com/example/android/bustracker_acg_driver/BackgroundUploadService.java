@@ -1,6 +1,7 @@
 package com.example.android.bustracker_acg_driver;
 
 import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,15 +10,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.android.bustracker_acg_driver.splash_screen.JSONParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,20 +32,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by giorgos on 3/5/2016.
  */
 public class BackgroundUploadService extends Service implements
-        ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+        ConnectionCallbacks,
+        OnConnectionFailedListener,
+        LocationListener,
+        ResultCallback<Status> {
 
+    // LOG_TAG
     private final String TAG = "BackgroundService";
 
+    // GoogleApiClient
     protected GoogleApiClient mGoogleApiClient;
+    // LocationRequest
     protected LocationRequest mLocationRequest;
+    // LastLocation
     protected Location mLastLocation;
-
+    // Geofences in an ArrayList
+    protected ArrayList<Geofence> mGeofenceList;
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
     // routeID
@@ -46,10 +63,49 @@ public class BackgroundUploadService extends Service implements
     // SharedPreferences
     public static final String PREFS_FILE = "DriverPreferencesFile";
 
+
+
+    public static final HashMap<String, LatLng> ZOGRAFOU_LANDMARKS = new HashMap<String, LatLng>();
+    static {
+        // my home
+        ZOGRAFOU_LANDMARKS.put("George's home", new LatLng(37.972956, 23.778996));
+
+        // antony's home
+        ZOGRAFOU_LANDMARKS.put("Antony's home", new LatLng(37.974050, 23.778461));
+    }
+
+    /**
+     * Used to set an expiration time for a geofence. After this amount of time Location Services
+     * stops tracking the geofence.
+     */
+    public static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+
+    /**
+     * For this sample, geofences expire after twelve hours.
+     */
+    public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
+            GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
+    //public static final float GEOFENCE_RADIUS_IN_METERS = 1609; // 1 mile, 1.6 km
+    public static final float GEOFENCE_RADIUS_IN_METERS = 50;
+
+
+
+
+
+
     @Override
     public void onCreate() {
         Log.e(TAG, "onCreate() ========");
+        // Build the GooleApiClient
         buildGoogleApiClient();
+
+        // Empty list for storing geofences.
+        mGeofenceList = new ArrayList<Geofence>();
+
+        // Get the geofences used. Geofence data is hard coded in this sample.
+        populateGeofenceList();
+
+
     }
 
     @Override
@@ -113,15 +169,18 @@ public class BackgroundUploadService extends Service implements
         // the onLocationChanged is running(!) ~5 minutes after the service has stopped
         if (isServiceRunning(this.getClass())) {
             // Execute the AsyncTask
-            UploadCoordinates uploadCoordinatesToDb = new UploadCoordinates();
-            uploadCoordinatesToDb.execute(routeID);
+//            UploadCoordinates uploadCoordinatesToDb = new UploadCoordinates();
+//            uploadCoordinatesToDb.execute(routeID);
         }
+
+
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
+
 
     private boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -135,11 +194,103 @@ public class BackgroundUploadService extends Service implements
         return false;
     }
 
+    /**
+     *
+     *  TEST for geofences
+     *  (the next two methods)
+     */
+    public void geofenceTest(){
+        try {
+            LocationServices.GeofencingApi.addGeofences(
+                    mGoogleApiClient,
+                    // The GeofenceRequest object.
+                    getGeofencingRequest(),
+                    // A pending intent that that is reused when calling removeGeofences(). This
+                    // pending intent is used to generate an intent when a matched geofence
+                    // transition is observed.
+                    getGeofencePendingIntent()
+            ).setResultCallback(this); // Result processed in onResult().
+        } catch (SecurityException securityException) {
+            // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
+            Log.e("Security Exception: ", securityException.toString());
+        }
+    }
 
-    // AsyncTask to upload the location of the bus
-    private static final String UPLOAD_COORDINATES_URL = "http://ashoka.students.acg.edu/BusTrackerAndroid/webServices/uploadCoordinates.php";
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+
+        // The INITIAL_TRIGGER_ENTER flag indicates that geofencing service should trigger a
+        // GEOFENCE_TRANSITION_ENTER notification when the geofence is added and if the device
+        // is already in that geofence
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+
+        // Add the geofences to be monitored by geofencing service
+        builder.addGeofences(mGeofenceList);
+
+        // Return a GeofencingRequest
+        return builder.build();
+    }
+
+
+    // Populate the Geofences ArrayList
+    public void populateGeofenceList() {
+
+        for (Map.Entry<String, LatLng> entry : ZOGRAFOU_LANDMARKS.entrySet()) {
+            mGeofenceList.add(new Geofence.Builder()
+                    // Set the request ID of the geofence. This is a string to identify this
+                    // geofence.
+                    .setRequestId(entry.getKey())
+
+                            // Set the circular region of this geofence.
+                    .setCircularRegion(
+                            entry.getValue().latitude,
+                            entry.getValue().longitude,
+                            GEOFENCE_RADIUS_IN_METERS
+                    )
+
+                            // Set the expiration duration of the geofence. This geofence gets automatically
+                            // removed after this period of time.
+                    .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+
+                            // Set the transition types of interest. Alerts are only generated for these
+                            // transition. We track entry and exit transitions in this sample.
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                            Geofence.GEOFENCE_TRANSITION_EXIT)
+
+                            // Create the geofence.
+                    .build());
+        }
+
+    }
+
+
+    @Override
+    public void onResult(Status status) {
+        if (status.isSuccess()) {
+            Toast.makeText(
+                    this,
+                    "Geofences Added",
+                    Toast.LENGTH_SHORT
+            ).show();
+        } else {
+            // Get the status code for the error and log it using a user-friendly message.
+            String errorMessage = GeofenceErrorMessages.getErrorString(this,
+                    status.getStatusCode());
+        }
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling addgeoFences()
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 
     class UploadCoordinates extends AsyncTask<Integer, String, String> {
+
+        // LOG_TAG
+        private static final String TAG = "UploadCoordinates";
+        // AsyncTask to upload the location of the bus
+        private static final String UPLOAD_COORDINATES_URL = "http://ashoka.students.acg.edu/BusTrackerAndroid/webServices/uploadCoordinates.php";
         //ids
         private static final String TAG_SUCCESS = "success";
         private static final String TAG_MESSAGE = "message";
