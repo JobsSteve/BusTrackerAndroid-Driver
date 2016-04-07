@@ -100,7 +100,9 @@ public class MainActivity extends AppCompatActivity implements
 
         }
 
+        // Build the GoogleApiClient
         buildGoogleApiClient();
+        // And connect
         mGoogleApiClient.connect();
         // Location Request
         mLocationRequest = LocationRequest.create();
@@ -148,27 +150,14 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-
-
-//        // OPEN THE GPS
-//        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//        boolean enabled = locationManager
-//                .isProviderEnabled(LocationManager.GPS_PROVIDER);
-//
-//        // check if enabled and if not send user to the GSP settings
-//        // Better solution would be to display a dialog and suggesting to
-//        // go to the settings
-//        if (!enabled) {
-//            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//            startActivity(intent);
-//        }
-
         // Find the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.driver_map);
         // A googleMap must be acquired using getMapAsync(OnMapReadyCallback).
         // This class automatically initializes the maps system and the view.
         mapFragment.getMapAsync(this);
     }
+
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
