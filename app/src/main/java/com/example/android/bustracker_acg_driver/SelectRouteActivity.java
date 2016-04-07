@@ -74,6 +74,9 @@ public class SelectRouteActivity extends AppCompatActivity {
     }
 
 
+    /**
+     *  AsyncTask to setup the list adapter
+     */
     private class SetAdapterAsyncTask extends
             AsyncTask<Void, Void, SelectRouteListAdapter> {
 
@@ -102,7 +105,7 @@ public class SelectRouteActivity extends AppCompatActivity {
             BusTrackerDBHelper db = new BusTrackerDBHelper(SelectRouteActivity.this);
 
 
-            /*
+            /**
              * Preparing the list data
              */
             if (language.equals(GR)) {
@@ -119,7 +122,6 @@ public class SelectRouteActivity extends AppCompatActivity {
             // Initialize the listStartingPoint
             listStartingPoints = new ArrayList<>();
             for (int i = 0; i < routesSize; i ++){
-                Log.e(TAG, "i: " + i);
                 listStartingTimes = db.getStartingTimes();
                 // Add StartingPoint - Objects to listStartingPoints
                 listStartingPoints.add(new StartingPoint(listRouteIDs.get(i), listRoutes.get(i), listStartingTimes.get(i)));
@@ -157,7 +159,9 @@ public class SelectRouteActivity extends AppCompatActivity {
         }
     }
 
-    // Dialog Fragment for route confirmation
+    /**
+     *  Dialog Fragment for route confirmation
+     */
     public static class ConfirmRouteDialogFragment extends DialogFragment {
 
         // Route Text View

@@ -1,18 +1,26 @@
 package com.example.android.bustracker_acg_driver;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
+import com.example.android.bustracker_acg_driver.network_connection.NetworkUtility;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -46,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements
 
     // LOG TAG
     protected static final String TAG = "MainActivity";
+    // ImageButton for the Network Status
+    ImageButton networkStatusButton;
     // Google API Client
     protected GoogleApiClient mGoogleApiClient;
     // Location Request
@@ -65,9 +75,14 @@ public class MainActivity extends AppCompatActivity implements
             .bearing(0)
             .tilt(0)
             .build();
-
     // The selectedRouteID
     private int routeID;
+    // NetworkChangeReceiver
+    NetworkChangeReceiver mNetworkChangeReceiver = null;
+    // Flag to know if the receiver is registered
+    boolean isReceiverRegistered = false;
+
+
 
 
     @Override
@@ -79,6 +94,15 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.mipmap.ic_launcher);
+
+        // Get the ImageButton
+        networkStatusButton = (ImageButton) findViewById(R.id.network_status_button);
+        networkStatusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, NetworkUtility.getConnectivityStatusString(MainActivity.this), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Check if there are arguments passed to the fragment
         Bundle bundleExtras = getIntent().getExtras();
@@ -169,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        final LocationSettingsStates states = LocationSettingsStates.fromIntent(intent);
+//        final LocationSettingsS states = LocationSettingsStates.fromIntent(intent);
         switch (requestCode) {
             case 1000:
                 switch (resultCode) {
@@ -217,6 +241,14 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         Log.e(TAG, "onResume ========");
+
+        // Register the NetworkChangedReceiver
+        if (!isReceiverRegistered) {
+            if (mNetworkChangeReceiver == null)
+                mNetworkChangeReceiver = new NetworkChangeReceiver();
+            registerReceiver(mNetworkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+            isReceiverRegistered = true;
+        }
     }
 
     @Override
@@ -271,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if (gMapReady){
             // Add a marker and Fly camera there
-//            setMarker(mPosition);
+            setMarker(mPosition);
         }
 
     }
@@ -311,8 +343,8 @@ public class MainActivity extends AppCompatActivity implements
         gMap.animateCamera(CameraUpdateFactory.newCameraPosition(target), 1000, null);
     }
 
-    /*
-        Add a marker to
+    /**
+        Re-Set the (bus) marker
      */
     private void setMarker(LatLng latLng) {
         // Remove the latest marker
@@ -333,8 +365,28 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    /*
-        AsyncTask to prepare the array lists with the information for the map
+    public void updateNetworkStatusButton(int connectivityStatus){
+        Drawable newBackground = null;
+
+        if (connectivityStatus == NetworkUtility.TYPE_WIFI){
+            newBackground = getResources().getDrawable(R.drawable.network_status_button_wifi);
+        } else if (connectivityStatus == NetworkUtility.TYPE_MOBILE){
+            newBackground = getResources().getDrawable(R.drawable.network_status_button_mobile);
+        } else if (connectivityStatus == NetworkUtility.TYPE_NOT_CONNECTED){
+            newBackground = getResources().getDrawable(R.drawable.network_status_button_not_connected);
+        }
+
+        try {
+            networkStatusButton.setBackground(newBackground);
+            networkStatusButton.invalidate();
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage() + ", or NullPointerException");
+        }
+    }
+
+
+    /**
+     *   AsyncTask to prepare the array lists with the information for the map
      */
     private class PrepareDataAsyncTask extends
             AsyncTask<Void, Void, Void> {
@@ -409,9 +461,27 @@ public class MainActivity extends AppCompatActivity implements
                 Log.e(TAG, "NullPointerException: " + e.getMessage());
             }
 
-
         }
 
+    }
+
+
+    public class NetworkChangeReceiver extends BroadcastReceiver {
+
+        // LOG_TAG
+        private static final String TAG = "NetworkChangeReceiver";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String status = NetworkUtility.getConnectivityStatusString(context);
+            int connectivityStatus = NetworkUtility.getConnectivityStatus(context);
+
+            // Log the new status
+            Log.e(TAG, connectivityStatus + ": " + status);
+
+            // Update the UI
+            updateNetworkStatusButton(connectivityStatus);
+        }
     }
 
 

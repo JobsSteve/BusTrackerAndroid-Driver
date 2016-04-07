@@ -7,6 +7,10 @@ import android.net.NetworkInfo;
 /**
  * This class can be used to check the network state
  * of the device at any moment.
+ *
+ * To do so, use a BroadcastReceiver.
+ * If UI must be updated BroadcastReceiver has to be an inner class
+ *
  */
 public class NetworkUtility {
 
@@ -43,6 +47,7 @@ public class NetworkUtility {
         }
         return TYPE_NOT_CONNECTED;
     }
+
 
     public static String getConnectivityStatusString(Context context) {
         int conn = getConnectivityStatus(context);
