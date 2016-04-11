@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:padding="@dimen/extra_large_padding"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/title_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/confirm_route_end_question"
+        android:textSize="@dimen/medium_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/route_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/medium_margin"
+        android:gravity="center_horizontal"
+        android:text="Γλυφάδα"
+        android:textSize="@dimen/small_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_below="@+id/title_text_view"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/no_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large_margin"
+        android:layout_marginRight="@dimen/large_margin"
+        android:layout_marginEnd="@dimen/large_margin"
+        android:text="@string/no_button"
+        android:background="@drawable/rounded_negative_button_states"
+        android:layout_below="@+id/route_text_view"
+        android:layout_toLeftOf="@+id/yes_button"
+        android:layout_toStartOf="@+id/yes_button" />
+
+    <Button
+        android:id="@+id/yes_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large_margin"
+        android:text="@string/yes_button"
+        android:background="@drawable/rounded_positive_button_states"
+        android:layout_below="@+id/route_text_view"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+</RelativeLayout>

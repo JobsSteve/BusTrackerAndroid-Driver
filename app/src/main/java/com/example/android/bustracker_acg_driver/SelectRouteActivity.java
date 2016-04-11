@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -40,11 +41,23 @@ public class SelectRouteActivity extends AppCompatActivity {
     public static final String ENG = "ENG";
     // Selected route ID
     public static final String ROUTE_ID = "selectedRouteID";
+    // Selected route Name
+    public static final String ROUTE_NAME = "selectedRouteName";
+    // Selected route's end latitude
+    public static final String END_LAT = "Latitude";
+    // Selected route's end longitude
+    public static final String END_LNG = "Longitude";
+    // Selected route in progress
+    public static final String ROUTE_IN_PROGRESS = "selectedRouteInProgress";
     // SharedPreferences
     SharedPreferences sharedPreferences;
     static SharedPreferences.Editor editor;
     // The StartingPoint object of the selected route
     protected static StartingPoint selectedStartingPoint;
+    // Ending LatLngs ArrayList
+    ArrayList<LatLng> listEndingLatLngs;
+    // The LatLng of the last station of the selected route
+    protected static LatLng selectedEndingLatLng;
 
 
     // List View
@@ -115,6 +128,7 @@ public class SelectRouteActivity extends AppCompatActivity {
             }
 
             listStartingTimes = db.getStartingTimes();
+            listEndingLatLngs = db.getEndingLatLngs();
             listRouteIDs = db.getAllRouteIDs();
 
             // Get the size of the listRoutes
@@ -148,7 +162,8 @@ public class SelectRouteActivity extends AppCompatActivity {
                     Log.e(TAG, "onItemClick: " + position + " = routeID");
 
                     selectedStartingPoint = (StartingPoint)parent.getItemAtPosition(position);
-                    Log.e(TAG, selectedStartingPoint.getRouteName());
+                    selectedEndingLatLng = listEndingLatLngs.get(position - 1);
+                    Log.e(TAG, selectedStartingPoint.getRouteName() + " endingLatLng: " + selectedEndingLatLng);
 
                     ConfirmRouteDialogFragment confirmRouteDialogFragment = new ConfirmRouteDialogFragment();
                     confirmRouteDialogFragment.show(getSupportFragmentManager(), "ConfirmRoute");
@@ -179,7 +194,7 @@ public class SelectRouteActivity extends AppCompatActivity {
 
             View view = inflater.inflate(R.layout.dialog_fragment_confirm_route, null, false);
 
-            // Find the TestView and setText to it
+            // Find the TextView and setText to it
             routeTextView = (TextView) view.findViewById(R.id.route_text_view);
             routeTextView.setText(selectedStartingPoint.getRouteName());
 
@@ -194,9 +209,13 @@ public class SelectRouteActivity extends AppCompatActivity {
                     //The selected position is:
                     int selectedRouteID = selectedStartingPoint.getRouteID();
 
-                    // Store the selectedRouteID as the routeID in sharedPreferences
+                    // Store the information we need in sharedPreferences
                     SelectRouteActivity.editor = getActivity().getSharedPreferences(PREFS_FILE, MODE_PRIVATE).edit();
                     editor.putInt(ROUTE_ID, selectedRouteID);
+                    editor.putString(ROUTE_NAME, selectedStartingPoint.getRouteName());
+                    editor.putString(END_LAT, String.valueOf(selectedEndingLatLng.latitude));
+                    editor.putString(END_LAT, String.valueOf(selectedEndingLatLng.longitude));
+                    editor.putBoolean(ROUTE_IN_PROGRESS, true);
                     editor.commit();
 
 

@@ -380,7 +380,7 @@ public class BusTrackerDBHelper extends SQLiteOpenHelper {
 
         for (int id : listRouteIDs) {
             listRouteStopsTimes = DatabaseContract.convertStringsToDates(getAllRouteStopTimes(id));
-            // Get the minimum Time
+            // Get the minimum Time - so the First Station
             Date minTime = Collections.min(listRouteStopsTimes);
             // Build the Time string
             String time = new StringBuilder()
@@ -393,7 +393,35 @@ public class BusTrackerDBHelper extends SQLiteOpenHelper {
 
         // Return the ArrayList with the Starting Times
         return startingTimes;
+    }
+
+
+    // Getting starting time of each route in an ArrayList
+    public ArrayList<LatLng> getEndingLatLngs() {
+        ArrayList<LatLng> endingLatLngs = new ArrayList<>();
+
+        // Get all route IDs
+        ArrayList<Integer> listRouteIDs = getAllRouteIDs();
+
+        // ArrayList with Date objects for the RouteStops - times of each route
+        ArrayList<Date> listRouteStopsTimes;
+
+        for (int id : listRouteIDs) {
+            listRouteStopsTimes = DatabaseContract.convertStringsToDates(getAllRouteStopTimes(id));
+            // Get the maximum Time - so the Last Station
+            Date maxTime = Collections.max(listRouteStopsTimes);
+            // Build the Time string
+            String time = new StringBuilder()
+                    .append(DatabaseContract.pad(maxTime.getHours())).append(":")
+                    .append(DatabaseContract.pad(maxTime.getMinutes())).toString();
+            // Get the LatLng of the RouteStop with the maximum Time
+            endingLatLngs.add(getRouteStopLatLng(id, time));
         }
+
+        // Return the ArrayList with the Starting Times
+        return endingLatLngs;
+    }
+
 
 
     // Getting routes Count
@@ -688,6 +716,36 @@ public class BusTrackerDBHelper extends SQLiteOpenHelper {
         return routeStopLatLngs;
     }
 
+
+    // Get the latLng of the RouteStop at stopTime, of the route with id == routeID
+    public LatLng getRouteStopLatLng(int routeID, String stopTime){
+        LatLng routeStopLatLng = null;
+
+        // Select the LatLng of the last RouteStop Query
+        String selectQuery = "SELECT " + RouteStopsEntry.COLUMN_LAT +
+                ", " + RouteStopsEntry.COLUMN_LNG +
+                " FROM " + RouteStopsEntry.TABLE_NAME +
+                " WHERE " + RouteStopsEntry.COLUMN_ROUTE_ID + " = " + routeID +
+                " AND " + RouteStopsEntry.COLUMN_STOP_TIME + " = " + "'" + stopTime + ":00'" + ";";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                routeStopLatLng = new LatLng(cursor.getDouble(0), cursor.getDouble(1));
+            } while (cursor.moveToNext());
+        }
+
+
+        // Closing database connection
+        db.close();
+        // Closing cursor
+        cursor.close();
+
+        return routeStopLatLng;
+    }
 
     // Getting routeStops Count
     // getRouteStopsCount() will return total number of routeStops in SQLite database.

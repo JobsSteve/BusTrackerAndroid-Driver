@@ -10,6 +10,7 @@
 
     <!-- Confirm Route Dialog Fragment-->
     <string name="confirm_route_question">Επιλέξατε Σωστά;</string>
+    <string name="confirm_route_end_question">Τέλος Διαδρομής;</string>
     <string name="yes_button">ΝΑΙ</string>
     <string name="no_button">ΟΧΙ</string>
 

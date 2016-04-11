@@ -65,32 +65,28 @@ public class BackgroundUploadService extends Service implements
 
 
 
-    public static final HashMap<String, LatLng> ZOGRAFOU_LANDMARKS = new HashMap<String, LatLng>();
+    public static final HashMap<String, LatLng> GEOFENCE_LANDMARKS = new HashMap<String, LatLng>();
     static {
-        // my home
-        ZOGRAFOU_LANDMARKS.put("George's home", new LatLng(37.972956, 23.778996));
+        // george's home
+        GEOFENCE_LANDMARKS.put("George's home", new LatLng(37.972956, 23.778996));
 
         // antony's home
-        ZOGRAFOU_LANDMARKS.put("Antony's home", new LatLng(37.974050, 23.778461));
+        GEOFENCE_LANDMARKS.put("Antony's home", new LatLng(37.974050, 23.778461));
     }
 
     /**
-     * Used to set an expiration time for a geofence. After this amount of time Location Services
+     * Used to set an expiration time for a geofence.
+     * After this amount of time Location Services
      * stops tracking the geofence.
      */
-    public static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+    public static final long GEOFENCE_EXPIRATION_IN_HOURS = 4;
 
     /**
-     * For this sample, geofences expire after twelve hours.
+     * There, geofences expire after 4 hours.
      */
     public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
-    //public static final float GEOFENCE_RADIUS_IN_METERS = 1609; // 1 mile, 1.6 km
     public static final float GEOFENCE_RADIUS_IN_METERS = 50;
-
-
-
-
 
 
     @Override
@@ -101,22 +97,30 @@ public class BackgroundUploadService extends Service implements
 
         // Empty list for storing geofences.
         mGeofenceList = new ArrayList<Geofence>();
+        // Route's name and last RouteStop's lat/lng
+        GEOFENCE_LANDMARKS.put(
+                getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.ROUTE_NAME, "DEREE"),
+                new LatLng(
+                        Double.parseDouble(getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.END_LAT, "38.00367")),
+                        Double.parseDouble(getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.END_LNG, "23.830351"))));
+
+        Log.e(TAG, GEOFENCE_LANDMARKS.toString());
 
         // Get the geofences used. Geofence data is hard coded in this sample.
         populateGeofenceList();
-
 
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand() ========");
-        routeID = getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getInt("selectedRouteID", 0);
+        routeID = getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getInt(SelectRouteActivity.ROUTE_ID, 0);
 
         Log.e(TAG, "routeID " + routeID);
         if (routeID == 0){
             onDestroy();
         }
+
         mGoogleApiClient.connect();
         return Service.START_STICKY;
     }
@@ -168,10 +172,23 @@ public class BackgroundUploadService extends Service implements
         // This method is called here because
         // the onLocationChanged is running(!) ~5 minutes after the service has stopped
         if (isServiceRunning(this.getClass())) {
+            Log.e(TAG, "Upoad Coordinates");
+            geofenceTest();
             // Execute the AsyncTask
-//            UploadCoordinates uploadCoordinatesToDb = new UploadCoordinates();
-//            uploadCoordinatesToDb.execute(routeID);
+            UploadCoordinates uploadCoordinatesToDb = new UploadCoordinates();
+            uploadCoordinatesToDb.execute(routeID);
+        } else {
+            Log.e(TAG, "Service has stopped");
+
+            // Disconnect GoogleApiClient
+            if (mGoogleApiClient.isConnected()){
+                mGoogleApiClient.disconnect();
+            }
+
+            // Stop this Service
+            stopSelf();
         }
+
 
 
     }
@@ -235,7 +252,7 @@ public class BackgroundUploadService extends Service implements
     // Populate the Geofences ArrayList
     public void populateGeofenceList() {
 
-        for (Map.Entry<String, LatLng> entry : ZOGRAFOU_LANDMARKS.entrySet()) {
+        for (Map.Entry<String, LatLng> entry : GEOFENCE_LANDMARKS.entrySet()) {
             mGeofenceList.add(new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this
                     // geofence.
@@ -332,7 +349,9 @@ public class BackgroundUploadService extends Service implements
 
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
+            } catch (NullPointerException e) {
+                Log.e(TAG, e.toString());
             }
 
             return null;

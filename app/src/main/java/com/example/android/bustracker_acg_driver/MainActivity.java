@@ -1,6 +1,7 @@
 package com.example.android.bustracker_acg_driver;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +13,18 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
@@ -83,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements
     boolean isReceiverRegistered = false;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements
         if (bundleExtras != null) {
             routeID = bundleExtras.getInt(SelectRouteActivity.ROUTE_ID);
 
-            if (routeID != 0){
+            if (routeID != 0) {
                 // BackgroundUploadService - Keep tracking even the app is closed
                 Intent service = new Intent(this, BackgroundUploadService.class);
                 startService(service);
@@ -173,14 +179,12 @@ public class MainActivity extends AppCompatActivity implements
         });
 
 
-
         // Find the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.driver_map);
         // A googleMap must be acquired using getMapAsync(OnMapReadyCallback).
         // This class automatically initializes the maps system and the view.
         mapFragment.getMapAsync(this);
     }
-
 
 
     protected synchronized void buildGoogleApiClient() {
@@ -249,7 +253,15 @@ public class MainActivity extends AppCompatActivity implements
             registerReceiver(mNetworkChangeReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
             isReceiverRegistered = true;
         }
+
+        // Check if Route is in progress
+        if (!getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).getBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, true)) {
+            ConfirmEndOfRouteDialogFragment confirmEndOfRouteDialogFragment = new ConfirmEndOfRouteDialogFragment();
+            confirmEndOfRouteDialogFragment.show(getSupportFragmentManager(), "ConfirmRouteEnd");
+        }
+
     }
+
 
     @Override
     protected void onPause() {
@@ -276,19 +288,17 @@ public class MainActivity extends AppCompatActivity implements
         moveTaskToBack(true);
     }
 
+
     /**
      * Runs when a GoogleApiClient object successfully connects.
      */
     @Override
     public void onConnected(Bundle bundle) {
-
-
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException e) {
             Log.e(TAG, "SecurityException: " + e.toString());
         }
-
     }
 
     @Override
@@ -308,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements
         mLastLocation = location;
         LatLng mPosition = new LatLng(location.getLatitude(), location.getLongitude());
 
-        if (gMapReady){
+        if (gMapReady) {
             // Add a marker and Fly camera there
             setMarker(mPosition);
         }
@@ -351,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-        Re-Set the (bus) marker
+     * Re-Set the (bus) marker
      */
     private void setMarker(LatLng latLng) {
         // Remove the latest marker
@@ -372,28 +382,28 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    public void updateNetworkStatusButton(int connectivityStatus){
+    public void updateNetworkStatusButton(int connectivityStatus) {
         Drawable newBackground = null;
 
-        if (connectivityStatus == NetworkUtility.TYPE_WIFI){
+        if (connectivityStatus == NetworkUtility.TYPE_WIFI) {
             newBackground = getResources().getDrawable(R.drawable.network_status_button_wifi);
-        } else if (connectivityStatus == NetworkUtility.TYPE_MOBILE){
+        } else if (connectivityStatus == NetworkUtility.TYPE_MOBILE) {
             newBackground = getResources().getDrawable(R.drawable.network_status_button_mobile);
-        } else if (connectivityStatus == NetworkUtility.TYPE_NOT_CONNECTED){
+        } else if (connectivityStatus == NetworkUtility.TYPE_NOT_CONNECTED) {
             newBackground = getResources().getDrawable(R.drawable.network_status_button_not_connected);
         }
 
         try {
             networkStatusButton.setBackground(newBackground);
             networkStatusButton.invalidate();
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage() + ", or NullPointerException");
         }
     }
 
 
     /**
-     *   AsyncTask to prepare the array lists with the information for the map
+     * AsyncTask to prepare the array lists with the information for the map
      */
     private class PrepareDataAsyncTask extends
             AsyncTask<Void, Void, Void> {
@@ -434,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements
                 stationTimes = db.getAllRouteStopTimes(routeID);
                 stationLatLngs = db.getAllRouteStopLatLngs(routeID);
                 stationSnappedLatLngs = db.getAllSnappedPointLatLngs(routeID);
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             }
             return null;
@@ -462,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 polylineOptions.width(10).color(Color.RED);
                 gMap.addPolyline(polylineOptions);
-            } catch (Exception e){
+            } catch (Exception e) {
                 moveTo(ATHENS);
 
                 Log.e(TAG, "NullPointerException: " + e.getMessage());
@@ -492,5 +502,74 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    /**
+     * Dialog Fragment for route confirmation
+     */
+    public static class ConfirmEndOfRouteDialogFragment extends DialogFragment {
+
+        // Route Text View
+        private TextView routeTextView;
+        // Yes - positive button
+        private Button yesButton;
+        // No - negative button
+        private Button noButton;
+
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+
+            View view = inflater.inflate(R.layout.dialog_fragment_confirm_route_end, null, false);
+
+            // Find the TextView and setText to it
+            routeTextView = (TextView) view.findViewById(R.id.route_text_view);
+            routeTextView.setText(getActivity().getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.ROUTE_NAME, "DEREE"));
+
+            // Setup the YES button
+            yesButton = (Button) view.findViewById(R.id.yes_button);
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Dismiss the dialog
+                    dismiss();
+
+                    // Store the selectedRouteID as the routeID in sharedPreferences
+                    SharedPreferences.Editor editor = getActivity().getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).edit();
+                    editor.putBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, false);
+                    editor.commit();
+
+                    // BackgroundUploadService - Keep tracking even the app is closed
+                    Intent service = new Intent(getActivity(), BackgroundUploadService.class);
+                    getActivity().stopService(service);
+
+                    clearNotification();
+
+                    getActivity().finish();
+
+                }
+            });
+
+            // Setup the NO button
+            noButton = (Button) view.findViewById(R.id.no_button);
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
+
+
+            getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+            return view;
+        }
+
+        public void clearNotification(){
+            NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(0);
+        }
+
+    }
 
 }

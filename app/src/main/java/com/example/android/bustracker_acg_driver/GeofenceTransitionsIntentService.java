@@ -1,6 +1,7 @@
 package com.example.android.bustracker_acg_driver;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -61,9 +62,18 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     triggeringGeofences
             );
 
-            // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
-            Log.i(TAG, geofenceTransitionDetails);
+
+            // if route is still in progress - Notify
+            if (getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).getBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, true)) {
+                // Send notification and log the transition details.
+                sendNotification(geofenceTransitionDetails);
+
+                // Edit() ROUTE_IN_PROGRESS - Set it to false
+                getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).edit().putBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, false).commit();
+
+            }
+
+            Log.e(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
@@ -127,7 +137,11 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 .setColor(Color.RED)
                 .setContentTitle(notificationDetails)
                 .setContentText(getString(R.string.geofence_transition_notification_text))
-                .setContentIntent(notificationPendingIntent);
+                .setContentIntent(notificationPendingIntent)
+                .setDefaults(Notification.DEFAULT_SOUND |
+                        Notification.DEFAULT_VIBRATE |
+                        Notification.DEFAULT_LIGHTS);
+//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         // Dismiss notification once the user touches it.
         builder.setAutoCancel(true);
@@ -137,6 +151,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Issue the notification
+        // The notification_Id = 0
         mNotificationManager.notify(0, builder.build());
     }
 
