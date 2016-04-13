@@ -19,7 +19,7 @@ import android.widget.ProgressBar;
 import com.example.android.bustracker_acg_driver.BackgroundUploadService;
 import com.example.android.bustracker_acg_driver.MainActivity;
 import com.example.android.bustracker_acg_driver.R;
-import com.example.android.bustracker_acg_driver.SelectRouteActivity;
+import com.example.android.bustracker_acg_driver.select_route_activity.SelectRouteActivity;
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
 import com.example.android.bustracker_acg_driver.database.RouteDAO;
 import com.example.android.bustracker_acg_driver.database.RouteStopDAO;

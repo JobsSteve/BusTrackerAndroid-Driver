@@ -63,7 +63,7 @@
         </activity>
 
         <activity
-            android:name=".SelectRouteActivity"
+            android:name=".select_route_activity.SelectRouteActivity"
             android:configChanges="orientation"
             android:noHistory="true"
             android:screenOrientation="portrait" />
@@ -78,7 +78,7 @@
             android:icon="@mipmap/ic_launcher"
             android:label="BackgroundUploadService" />
 
-        <service android:name=".GeofenceTransitionsIntentService" />
+        <service android:name=".geofence.GeofenceTransitionsIntentService" />
 
     </application>
 

@@ -1,4 +1,4 @@
-package com.example.android.bustracker_acg_driver;
+package com.example.android.bustracker_acg_driver.geofence;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -13,6 +13,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.android.bustracker_acg_driver.MainActivity;
+import com.example.android.bustracker_acg_driver.R;
+import com.example.android.bustracker_acg_driver.select_route_activity.SelectRouteActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 

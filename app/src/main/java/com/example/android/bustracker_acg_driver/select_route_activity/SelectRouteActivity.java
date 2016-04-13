@@ -1,4 +1,4 @@
-package com.example.android.bustracker_acg_driver;
+package com.example.android.bustracker_acg_driver.select_route_activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.bustracker_acg_driver.MainActivity;
+import com.example.android.bustracker_acg_driver.R;
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
 import com.google.android.gms.maps.model.LatLng;
 

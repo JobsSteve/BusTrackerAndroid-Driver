@@ -1,8 +1,9 @@
-package com.example.android.bustracker_acg_driver;
+package com.example.android.bustracker_acg_driver.geofence;
 
 import android.content.Context;
 import android.content.res.Resources;
 
+import com.example.android.bustracker_acg_driver.R;
 import com.google.android.gms.location.GeofenceStatusCodes;
 
 public class GeofenceErrorMessages {
