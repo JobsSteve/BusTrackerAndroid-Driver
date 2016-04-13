@@ -4,7 +4,6 @@ package com.example.android.bustracker_acg_driver.splash_screen;
  * Created by giorgos on 4/4/2016.
  */
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -19,11 +18,11 @@ import android.widget.ProgressBar;
 import com.example.android.bustracker_acg_driver.BackgroundUploadService;
 import com.example.android.bustracker_acg_driver.MainActivity;
 import com.example.android.bustracker_acg_driver.R;
-import com.example.android.bustracker_acg_driver.select_route_activity.SelectRouteActivity;
 import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
 import com.example.android.bustracker_acg_driver.database.RouteDAO;
 import com.example.android.bustracker_acg_driver.database.RouteStopDAO;
 import com.example.android.bustracker_acg_driver.database.SnappedPointDAO;
+import com.example.android.bustracker_acg_driver.select_route_activity.SelectRouteActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -243,10 +242,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             if (json_response != null){
 //                Log.e(TAG, "DONE!!");
 
-                // Put Language SharedPreferences to English
-                getSharedPreferences(SelectRouteActivity.PREFS_FILE, Activity.MODE_PRIVATE)
-                        .edit()
-                        .putString(SelectRouteActivity.LANGUAGE, SelectRouteActivity.ENG);
+
                 // Start the main activity
                 startSelectRouteActivity();
             } else {

@@ -9,10 +9,11 @@
     <string name="splash_secret_txt">Bus Tracker - Driver</string>
 
     <!-- Confirm Route Dialog Fragment-->
-    <string name="confirm_route_question">Επιλέξατε Σωστά;</string>
-    <string name="confirm_route_end_question">Τέλος Διαδρομής;</string>
-    <string name="yes_button">ΝΑΙ</string>
-    <string name="no_button">ΟΧΙ</string>
+    <string name="list_header">Select Route</string>
+    <string name="confirm_route_question">Properly selected?</string>
+    <string name="confirm_route_end_question">End \nof Route?</string>
+    <string name="yes_button">YES</string>
+    <string name="no_button">NO</string>
 
     <!-- GEOFENCING-->
     <!-- Transition type strings -->
@@ -33,7 +34,7 @@
     <string name="geofence_transition_invalid_type">
         Geofence transition error: invalid transition type %1$d
     </string>
-    <string name="geofence_transition_notification_text">Click notification to return to app</string>
+    <string name="geofence_transition_notification_text">End of Route?</string>
 
 
 </resources>

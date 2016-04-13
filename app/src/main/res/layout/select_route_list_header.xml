@@ -13,7 +13,7 @@
         android:layout_marginTop="@dimen/list_item_large_margin"
         android:padding="@dimen/list_item_large_margin"
         android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
-        android:text="Επιλέξτε διαδρομη"
+        android:text="@string/list_header"
         android:textAlignment="center"
         android:textSize="@dimen/list_item_large_text_size"
         android:textColor="@color/colorPrimaryDark"

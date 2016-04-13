@@ -24,6 +24,7 @@ import com.example.android.bustracker_acg_driver.database.BusTrackerDBHelper;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by giorgos on 4/4/2016.
@@ -36,11 +37,6 @@ public class SelectRouteActivity extends AppCompatActivity {
     private final String TAG = "SelectRouteActivity";
     // SharedPreferences file name
     public static final String PREFS_FILE = "DriverPreferencesFile";
-    // sharedPreference key for language preference
-    public static final String LANGUAGE = "LanguagePreference";
-    // supported languages
-    public static final String GR = "GR";
-    public static final String ENG = "ENG";
     // Selected route ID
     public static final String ROUTE_ID = "selectedRouteID";
     // Selected route Name
@@ -60,8 +56,6 @@ public class SelectRouteActivity extends AppCompatActivity {
     ArrayList<LatLng> listEndingLatLngs;
     // The LatLng of the last station of the selected route
     protected static LatLng selectedEndingLatLng;
-
-
     // List View
     private ListView listView;
     // View for the List View Header
@@ -104,8 +98,6 @@ public class SelectRouteActivity extends AppCompatActivity {
 
             // Check SharedPreferences for the language
             sharedPreferences = getSharedPreferences(PREFS_FILE, Activity.MODE_PRIVATE);
-            // Get the language
-            String language = sharedPreferences.getString(LANGUAGE, GR);
             // Select Route List Adapter
             SelectRouteListAdapter selectRouteListAdapter;
             // Routes ArrayList
@@ -123,7 +115,8 @@ public class SelectRouteActivity extends AppCompatActivity {
             /**
              * Preparing the list data
              */
-            if (language.equals(GR)) {
+
+            if ( Locale.getDefault().getDisplayLanguage().equals("Ελληνικά") ) {
                 listRoutes = db.getAllRouteNamesGR();
             } else {
                 listRoutes = db.getAllRouteNamesENG();

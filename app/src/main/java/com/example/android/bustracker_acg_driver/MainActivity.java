@@ -56,6 +56,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -428,12 +429,11 @@ public class MainActivity extends AppCompatActivity implements
             try {
                 // Check SharedPreferences for the language
                 SharedPreferences sharedPreferences = getSharedPreferences(SelectRouteActivity.PREFS_FILE, Activity.MODE_PRIVATE);
-                // get the language
-                String language = sharedPreferences.getString(SelectRouteActivity.LANGUAGE, SelectRouteActivity.GR);
                 // Database Helper
                 BusTrackerDBHelper db = new BusTrackerDBHelper(MainActivity.this);
 
-                if (language.equals(SelectRouteActivity.GR)) {
+
+                if ( Locale.getDefault().getDisplayLanguage().equals("Ελληνικά") ) {
                     routeName = db.getRouteNameGR_byID(routeID);
                     stationNames = db.getAllRouteStopNamesGR(routeID);
                 } else {

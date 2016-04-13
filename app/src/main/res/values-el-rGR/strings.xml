@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">BusTracker-ACG-Driver</string>
+
+    <!-- Google App ID-->
+    <string name="google_app_id">bustracker-acg-driver</string>
+
+    <!--  Images Descriptions -->
+    <string name="desc_splash_icon">Splash Image</string>
+    <string name="splash_secret_txt">Bus Tracker - Driver</string>
+
+    <!-- Confirm Route Dialog Fragment-->
+    <string name="list_header">Επιλέξτε διαδρομη</string>
+    <string name="confirm_route_question">Επιλέξατε Σωστά;</string>
+    <string name="confirm_route_end_question">Τέλος Διαδρομής;</string>
+    <string name="yes_button">ΝΑΙ</string>
+    <string name="no_button">ΟΧΙ</string>
+
+    <!-- GEOFENCING-->
+    <!-- Transition type strings -->
+    <string name="geofence_transition_entered">Είσοδος</string>
+    <string name="geofence_transition_exited">Έξοδος</string>
+    <string name="unknown_geofence_transition">Άγνωστη Μετάβαση</string>
+
+    <!-- Error strings -->
+    <string name="not_connected">GoogleApiClient δεν συνδέθηκε ακόμα. Δοκιμάστε ξανά.</string>
+    <string name="geofence_not_available">Η υπηρεσία Geofence δεν είναι διαθέσιμη</string>
+    <string name="geofence_too_many_geofences">Η εφαρμογή σας έχει εγκατεστημένα πολλά geofences</string>
+    <string name="geofence_too_many_pending_intents">
+        Παρέχετε πολλά PendingIntents στην μέθοδο addGeofences()
+    </string>
+    <string name="unknown_geofence_error">
+        Άγνωστο σφάλμα: η υπηρεσία Geofence δεν είναι διαθέσιμη τώρα
+    </string>
+    <string name="geofence_transition_invalid_type">
+        Geofence σφάλμα μετάβασης: άκυρος τύπος μετάβασης %1$d
+    </string>
+    <string name="geofence_transition_notification_text">Τέλος Διαδρομής;</string>
+
+
+</resources>
