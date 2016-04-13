@@ -29,29 +29,34 @@
         android:layout_below="@+id/title_text_view"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:id="@+id/no_button"
+
+    <LinearLayout
+        android:id="@+id/buttons_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="@dimen/large_margin"
-        android:layout_marginRight="@dimen/large_margin"
-        android:layout_marginEnd="@dimen/large_margin"
-        android:text="@string/no_button"
-        android:background="@drawable/rounded_negative_button_states"
         android:layout_below="@+id/route_text_view"
-        android:layout_toLeftOf="@+id/yes_button"
-        android:layout_toStartOf="@+id/yes_button" />
+        android:layout_centerHorizontal="true">
 
-    <Button
-        android:id="@+id/yes_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large_margin"
-        android:text="@string/yes_button"
-        android:background="@drawable/rounded_positive_button_states"
-        android:layout_below="@+id/route_text_view"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        <Button
+            android:id="@+id/no_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/large_margin"
+            android:layout_marginEnd="@dimen/large_margin"
+            android:text="@string/no_button"
+            android:background="@drawable/rounded_negative_button_states"
+            />
 
+        <Button
+            android:id="@+id/yes_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yes_button"
+            android:background="@drawable/rounded_positive_button_states"
+            />
+
+    </LinearLayout>
 
 </RelativeLayout>
