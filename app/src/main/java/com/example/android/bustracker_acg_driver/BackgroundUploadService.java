@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.android.bustracker_acg_driver.splash_screen.JSONParser;
 import com.google.android.gms.common.ConnectionResult;
@@ -72,6 +71,12 @@ public class BackgroundUploadService extends Service implements
 
         // antony's home
         GEOFENCE_LANDMARKS.put("Antony's home", new LatLng(37.974050, 23.778461));
+
+        // alex's home
+        GEOFENCE_LANDMARKS.put("Alex's home", new LatLng(37.9748708, 23.7706665));
+
+        //graveyard
+        GEOFENCE_LANDMARKS.put("Graveyard", new LatLng(37.971093, 23.781730));
     }
 
     /**
@@ -86,7 +91,7 @@ public class BackgroundUploadService extends Service implements
      */
     public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
             GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
-    public static final float GEOFENCE_RADIUS_IN_METERS = 50;
+    public static final float GEOFENCE_RADIUS_IN_METERS = 100;
 
 
     @Override
@@ -173,7 +178,9 @@ public class BackgroundUploadService extends Service implements
         // the onLocationChanged is running(!) ~5 minutes after the service has stopped
         if (isServiceRunning(this.getClass())) {
             Log.e(TAG, "Upoad Coordinates");
+
             geofenceTest();
+
             // Execute the AsyncTask
             UploadCoordinates uploadCoordinatesToDb = new UploadCoordinates();
             uploadCoordinatesToDb.execute(routeID);
@@ -211,11 +218,50 @@ public class BackgroundUploadService extends Service implements
         return false;
     }
 
-    /**
-     *
-     *  TEST for geofences
-     *  (the next two methods)
-     */
+
+    // Populate the Geofences ArrayList
+    public void populateGeofenceList() {
+
+        for (Map.Entry<String, LatLng> entry : GEOFENCE_LANDMARKS.entrySet()) {
+            mGeofenceList.add(new Geofence.Builder()
+                    // Set the request ID of the geofence. This is a string to identify this
+                    // geofence.
+                    .setRequestId(entry.getKey())
+
+                            // Set the circular region of this geofence.
+                    .setCircularRegion(
+                            entry.getValue().latitude,
+                            entry.getValue().longitude,
+                            GEOFENCE_RADIUS_IN_METERS
+                    )
+
+                            // Set the expiration duration of the geofence. This geofence gets automatically
+                            // removed after this period of time.
+                    .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+
+                            // Set the transition types of interest. Alerts are only generated for these
+                            // transition. We track entry and exit transitions in this sample.
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+
+                            // Create the geofence.
+                    .build());
+        }
+
+    }
+
+
+    @Override
+    public void onResult(Status status) {
+        if (status.isSuccess()) {
+            Log.e(TAG, "Geofences Added");
+        } else {
+            // Get the status code for the error and log it using a user-friendly message.
+            String errorMessage = GeofenceErrorMessages.getErrorString(this,
+                    status.getStatusCode());
+            Log.e(TAG, errorMessage);
+        }
+    }
+
     public void geofenceTest(){
         try {
             LocationServices.GeofencingApi.addGeofences(
@@ -248,53 +294,6 @@ public class BackgroundUploadService extends Service implements
         return builder.build();
     }
 
-
-    // Populate the Geofences ArrayList
-    public void populateGeofenceList() {
-
-        for (Map.Entry<String, LatLng> entry : GEOFENCE_LANDMARKS.entrySet()) {
-            mGeofenceList.add(new Geofence.Builder()
-                    // Set the request ID of the geofence. This is a string to identify this
-                    // geofence.
-                    .setRequestId(entry.getKey())
-
-                            // Set the circular region of this geofence.
-                    .setCircularRegion(
-                            entry.getValue().latitude,
-                            entry.getValue().longitude,
-                            GEOFENCE_RADIUS_IN_METERS
-                    )
-
-                            // Set the expiration duration of the geofence. This geofence gets automatically
-                            // removed after this period of time.
-                    .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-
-                            // Set the transition types of interest. Alerts are only generated for these
-                            // transition. We track entry and exit transitions in this sample.
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                            Geofence.GEOFENCE_TRANSITION_EXIT)
-
-                            // Create the geofence.
-                    .build());
-        }
-
-    }
-
-
-    @Override
-    public void onResult(Status status) {
-        if (status.isSuccess()) {
-            Toast.makeText(
-                    this,
-                    "Geofences Added",
-                    Toast.LENGTH_SHORT
-            ).show();
-        } else {
-            // Get the status code for the error and log it using a user-friendly message.
-            String errorMessage = GeofenceErrorMessages.getErrorString(this,
-                    status.getStatusCode());
-        }
-    }
 
     private PendingIntent getGeofencePendingIntent() {
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);

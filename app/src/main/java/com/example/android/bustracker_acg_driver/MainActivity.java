@@ -555,6 +555,10 @@ public class MainActivity extends AppCompatActivity implements
             noButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    // Edit() ROUTE_IN_PROGRESS - Set it to true
+                    getActivity().getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).edit().putBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, true).commit();
+
                     dismiss();
                 }
             });
