@@ -1,9 +1,5 @@
 package com.example.android.bustracker_acg_driver.select_route_activity;
 
-/**
- * Created by giorgos on 4/4/2016.
- */
-
 /*
  * This Object consists of the RouteNames and the Starting time of each route
  * and it is used from the SelectRouteListAdapter

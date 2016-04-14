@@ -1,5 +1,6 @@
 package com.example.android.bustracker_acg_driver;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -8,13 +9,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,12 +97,20 @@ public class MainActivity extends AppCompatActivity implements
     NetworkChangeReceiver mNetworkChangeReceiver = null;
     // Flag to know if the receiver is registered
     boolean isReceiverRegistered = false;
-
+    // Identifier for the permission request
+    private static final int LOCATION_PERMISSIONS_REQUEST = 1;
+    // LinearLayout - RootLayout
+    LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // Runtime permission for API23
+        getPermissionToReadUserLocation();
+
 
         // Set a Toolbar to replace the ActionBar/AppBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -140,6 +154,9 @@ public class MainActivity extends AppCompatActivity implements
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(1000);
+
+
+
         // Then create a LocationSettingsRequest.Builder
         // and add all of the LocationRequests that the app will be using:
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -181,11 +198,63 @@ public class MainActivity extends AppCompatActivity implements
         });
 
 
+
         // Find the map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.driver_map);
         // A googleMap must be acquired using getMapAsync(OnMapReadyCallback).
         // This class automatically initializes the maps system and the view.
         mapFragment.getMapAsync(this);
+    }
+
+
+    // Called when the user is performing an action which requires the app to read the
+    // user's contacts
+    public void getPermissionToReadUserLocation() {
+        // 1) Use the support library version ContextCompat.checkSelfPermission(...) to avoid
+        // checking the build version since Context.checkSelfPermission(...) is only available
+        // in Marshmallow
+        // 2) Always check for permission (even if permission has already been granted)
+        // since the user can revoke permissions at any time through Settings
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                // Marshmallow+
+
+                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                        LOCATION_PERMISSIONS_REQUEST);
+                return;
+            } else {
+                // Pre-Marshmallow
+            }
+
+        }
+    }
+
+
+    // Callback with the request from calling requestPermissions(...)
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        // Make sure it's our original LOCATION request
+        if (requestCode == LOCATION_PERMISSIONS_REQUEST) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                Toast.makeText(this, "Read Contacts permission granted", Toast.LENGTH_SHORT).show();
+
+                // Restart the activity
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            } else {
+//                Toast.makeText(this, "Read Contacts permission denied", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
 

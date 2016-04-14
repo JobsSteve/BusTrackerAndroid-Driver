@@ -3,7 +3,6 @@ package com.example.android.bustracker_acg_driver.select_route_activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -25,11 +24,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Locale;
-
-/**
- * Created by giorgos on 4/4/2016.
- */
-
 
 public class SelectRouteActivity extends AppCompatActivity {
 
@@ -77,97 +71,86 @@ public class SelectRouteActivity extends AppCompatActivity {
         listView.addHeaderView(listHeaderView, null, false);
         listView.addFooterView(listFooterView, null, false);
 
-        // Initialize and execute the AsyncTask to set the adapter
-        SetAdapterAsyncTask setAdapterAsyncTask = new SetAdapterAsyncTask();
-        setAdapterAsyncTask.execute();
-    }
+        // Adapter must be set after the header , footer
+        listView.setAdapter(getSelectRouteListAsapter());
 
+        // Add a listener
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e(TAG, "onItemClick: " + position + " = routeID");
 
-    /**
-     *  AsyncTask to setup the list adapter
-     */
-    private class SetAdapterAsyncTask extends
-            AsyncTask<Void, Void, SelectRouteListAdapter> {
-
-        // LOG TAG
-        private static final String TAG = "SetAdapterAsyncTask";
-
-        @Override
-        protected SelectRouteListAdapter doInBackground(Void... params) {
-
-
-            // Check SharedPreferences for the language
-            sharedPreferences = getSharedPreferences(PREFS_FILE, Activity.MODE_PRIVATE);
-            // Select Route List Adapter
-            SelectRouteListAdapter selectRouteListAdapter;
-            // Routes ArrayList
-            ArrayList<String> listRoutes;
-            // Starting Times ArrayList
-            ArrayList<String> listStartingTimes;
-            // Route IDs ArrrayList
-            ArrayList<Integer> listRouteIDs;
-            // StartingPoint Objects ArrayList
-            ArrayList<StartingPoint> listStartingPoints;
-            // Database Helper
-            BusTrackerDBHelper db = new BusTrackerDBHelper(SelectRouteActivity.this);
-
-
-            /**
-             * Preparing the list data
-             */
-
-            if ( Locale.getDefault().getDisplayLanguage().equals("Ελληνικά") ) {
-                listRoutes = db.getAllRouteNamesGR();
-            } else {
-                listRoutes = db.getAllRouteNamesENG();
-            }
-
-            listStartingTimes = db.getStartingTimes();
-            listEndingLatLngs = db.getEndingLatLngs();
-            listRouteIDs = db.getAllRouteIDs();
-
-            // Get the size of the listRoutes
-            int routesSize = listRoutes.size();
-            // Initialize the listStartingPoint
-            listStartingPoints = new ArrayList<>();
-            for (int i = 0; i < routesSize; i ++){
-                listStartingTimes = db.getStartingTimes();
-                // Add StartingPoint - Objects to listStartingPoints
-                listStartingPoints.add(new StartingPoint(listRouteIDs.get(i), listRoutes.get(i), listStartingTimes.get(i)));
-            }
-
-            // Create the SelectRouteList Adapter
-            selectRouteListAdapter = new SelectRouteListAdapter(SelectRouteActivity.this, R.layout.select_route_list_item, listStartingPoints);
-
-            // Return the SelectRouteListAdapter
-            return selectRouteListAdapter;
-        }
-
-        @Override
-        protected void onPostExecute(SelectRouteListAdapter selectRouteListAdapter) {
-            super.onPostExecute(selectRouteListAdapter);
-
-            // Adapter must be set after the header , footer
-            listView.setAdapter(selectRouteListAdapter);
-
-            // Add a listener
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Log.e(TAG, "onItemClick: " + position + " = routeID");
-
-                    selectedStartingPoint = (StartingPoint)parent.getItemAtPosition(position);
-                    selectedEndingLatLng = listEndingLatLngs.get(position - 1);
-                    Log.e(TAG, selectedStartingPoint.getRouteName() + " endingLatLng: " + selectedEndingLatLng);
-
-                    ConfirmRouteDialogFragment confirmRouteDialogFragment = new ConfirmRouteDialogFragment();
-                    confirmRouteDialogFragment.show(getSupportFragmentManager(), "ConfirmRoute");
-
+                for (int i = 0; i < listEndingLatLngs.size(); i++) {
+                    Log.e(TAG, listEndingLatLngs.get(i).toString());
                 }
-            });
 
-        }
+                selectedStartingPoint = (StartingPoint) parent.getItemAtPosition(position);
+                selectedEndingLatLng = listEndingLatLngs.get(position - 1);
+                Log.e(TAG, selectedStartingPoint.getRouteName() + " endingLatLng: " + selectedEndingLatLng);
+
+                ConfirmRouteDialogFragment confirmRouteDialogFragment = new ConfirmRouteDialogFragment();
+                confirmRouteDialogFragment.show(getSupportFragmentManager(), "ConfirmRoute");
+
+            }
+        });
+
+
     }
+
+
+    public SelectRouteListAdapter getSelectRouteListAsapter(){
+        // Check SharedPreferences for the language
+        sharedPreferences = getSharedPreferences(PREFS_FILE, Activity.MODE_PRIVATE);
+        // Select Route List Adapter
+        SelectRouteListAdapter selectRouteListAdapter;
+        // Routes ArrayList
+        ArrayList<String> listRoutes;
+        // Starting Times ArrayList
+        ArrayList<String> listStartingTimes;
+        // Route IDs ArrrayList
+        ArrayList<Integer> listRouteIDs;
+        // StartingPoint Objects ArrayList
+        ArrayList<StartingPoint> listStartingPoints;
+        // Database Helper
+        BusTrackerDBHelper db = new BusTrackerDBHelper(SelectRouteActivity.this);
+
+        /**
+         * Preparing the list data
+         */
+
+        if ( Locale.getDefault().getDisplayLanguage().equals("Ελληνικά") ) {
+            listRoutes = db.getAllRouteNamesGR();
+        } else {
+            listRoutes = db.getAllRouteNamesENG();
+        }
+
+        listStartingTimes = db.getStartingTimes();
+        listEndingLatLngs = db.getEndingLatLngs();
+        listRouteIDs = db.getAllRouteIDs();
+
+        // Get the size of the listRoutes
+        int routesSize = listRoutes.size();
+        // Initialize the listStartingPoint
+        listStartingPoints = new ArrayList<>();
+        for (int i = 0; i < routesSize; i ++){
+            listStartingTimes = db.getStartingTimes();
+            // Add StartingPoint - Objects to listStartingPoints
+            listStartingPoints.add(new StartingPoint(listRouteIDs.get(i), listRoutes.get(i), listStartingTimes.get(i)));
+        }
+
+        // Create the SelectRouteList Adapter
+        selectRouteListAdapter = new SelectRouteListAdapter(SelectRouteActivity.this, R.layout.select_route_list_item, listStartingPoints);
+
+        return selectRouteListAdapter;
+
+    }
+
+
+
+
+
+
+
 
     /**
      *  Dialog Fragment for route confirmation
@@ -209,7 +192,7 @@ public class SelectRouteActivity extends AppCompatActivity {
                     editor.putInt(ROUTE_ID, selectedRouteID);
                     editor.putString(ROUTE_NAME, selectedStartingPoint.getRouteName());
                     editor.putString(END_LAT, String.valueOf(selectedEndingLatLng.latitude));
-                    editor.putString(END_LAT, String.valueOf(selectedEndingLatLng.longitude));
+                    editor.putString(END_LNG, String.valueOf(selectedEndingLatLng.longitude));
                     editor.putBoolean(ROUTE_IN_PROGRESS, true);
                     editor.commit();
 

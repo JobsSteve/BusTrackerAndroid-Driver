@@ -1,9 +1,5 @@
 package com.example.android.bustracker_acg_driver.database;
 
-/**
- * Created by giorgos on 4/4/2016.
- */
-
 import android.provider.BaseColumns;
 import android.text.format.Time;
 import android.util.Log;

@@ -38,9 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by giorgos on 3/5/2016.
- */
+
 public class BackgroundUploadService extends Service implements
         ConnectionCallbacks,
         OnConnectionFailedListener,
@@ -64,23 +62,8 @@ public class BackgroundUploadService extends Service implements
     private int routeID;
     // SharedPreferences
     public static final String PREFS_FILE = "DriverPreferencesFile";
-
-
-
+    // Geofence
     public static final HashMap<String, LatLng> GEOFENCE_LANDMARKS = new HashMap<String, LatLng>();
-    static {
-        // george's home
-        GEOFENCE_LANDMARKS.put("George's home", new LatLng(37.972956, 23.778996));
-
-        // antony's home
-        GEOFENCE_LANDMARKS.put("Antony's home", new LatLng(37.974050, 23.778461));
-
-        // alex's home
-        GEOFENCE_LANDMARKS.put("Alex's home", new LatLng(37.9748708, 23.7706665));
-
-        //graveyard
-        GEOFENCE_LANDMARKS.put("Graveyard", new LatLng(37.971093, 23.781730));
-    }
 
     /**
      * Used to set an expiration time for a geofence.

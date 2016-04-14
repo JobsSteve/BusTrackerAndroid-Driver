@@ -153,7 +153,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             db = new BusTrackerDBHelper(getApplicationContext());
 
             try {
+                Log.e(TAG, "getJSONfromUrl");
                 JSONObject json = jsonParser.getJSONFromUrl(GET_COORDINATES_URL);
+                Log.e(TAG, "getJSONfromUrl - DONE");
+
 
                 success = json.getInt(TAG_SUCCESS);
                 if (success == 1) {

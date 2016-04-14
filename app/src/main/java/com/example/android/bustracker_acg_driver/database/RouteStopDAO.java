@@ -1,7 +1,6 @@
 package com.example.android.bustracker_acg_driver.database;
 
 /*
- * Created by giorgos on 3/19/2016.
  * A routeStop Data Access Object
  * (so we can manipulate the result of a select query)
  */

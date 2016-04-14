@@ -12,10 +12,6 @@ import com.example.android.bustracker_acg_driver.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by giorgos on 3/4/2016.
- */
-
 public class SelectRouteListAdapter extends ArrayAdapter<StartingPoint> {
 
     Context context;

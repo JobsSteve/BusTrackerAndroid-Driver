@@ -1,9 +1,5 @@
 package com.example.android.bustracker_acg_driver.database;
 
-/**
- * Created by giorgos on 4/4/2016.
- */
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -102,6 +98,7 @@ public class BusTrackerDBHelper extends SQLiteOpenHelper {
         onCreate(db);
 
     }
+
 
     /*
         All CRUD(Create, Read, Update, Delete) Operations
