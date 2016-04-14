@@ -95,10 +95,10 @@ public class BackgroundUploadService extends Service implements
                         Double.parseDouble(getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.END_LAT, "38.00367")),
                         Double.parseDouble(getSharedPreferences(PREFS_FILE, MODE_PRIVATE).getString(SelectRouteActivity.END_LNG, "23.830351"))));
 
-        Log.e(TAG, GEOFENCE_LANDMARKS.toString());
+        Log.e(TAG, "GEOFENCE_LANDMARKS: " + GEOFENCE_LANDMARKS.toString());
 
-        // Get the geofences used. Geofence data is hard coded in this sample.
-        populateGeofenceList();
+                // Get the geofences used. Geofence data is hard coded in this sample.
+                populateGeofenceList();
 
     }
 
@@ -163,7 +163,7 @@ public class BackgroundUploadService extends Service implements
         // This method is called here because
         // the onLocationChanged is running(!) ~5 minutes after the service has stopped
         if (isServiceRunning(this.getClass())) {
-            Log.e(TAG, "Upoad Coordinates");
+            Log.e(TAG, "Upload Coordinates");
 
             geofenceTest();
 

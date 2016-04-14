@@ -36,6 +36,20 @@
         android:src="@drawable/network_status_button_states"
         />
 
+
+    <ImageButton
+        android:id="@+id/end_route_button"
+        android:layout_margin="@dimen/medium_margin"
+        android:padding="@dimen/medium_padding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/end_route_rounded_view_button"
+        android:src="@drawable/end_route_button_states"
+        />
+
     </RelativeLayout>
 
 

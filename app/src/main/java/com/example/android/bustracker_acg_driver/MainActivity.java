@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements
 
     // LOG TAG
     protected static final String TAG = "MainActivity";
-    // ImageButton for the Network Status
-    ImageButton networkStatusButton;
+    // ImageButton for the Network Status, EndRoute
+    ImageButton networkStatusButton, endRoute;
     // Google API Client
     protected GoogleApiClient mGoogleApiClient;
     // Location Request
@@ -117,12 +117,22 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
         toolbar.setLogo(R.mipmap.ic_launcher);
 
-        // Get the ImageButton
+        // Get the Network Status ImageButton
         networkStatusButton = (ImageButton) findViewById(R.id.network_status_button);
         networkStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, NetworkUtility.getConnectivityStatusString(MainActivity.this), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Get the Forced End Route ImageButton
+        endRoute = (ImageButton) findViewById(R.id.end_route_button);
+        endRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConfirmEndOfRouteDialogFragment confirmEndOfRouteDialogFragment = new ConfirmEndOfRouteDialogFragment();
+                confirmEndOfRouteDialogFragment.show(getSupportFragmentManager(), "ConfirmRouteEnd");
             }
         });
 

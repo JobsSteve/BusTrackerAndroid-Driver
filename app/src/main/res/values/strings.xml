@@ -11,7 +11,7 @@
     <!-- Confirm Route Dialog Fragment-->
     <string name="list_header">Select Route</string>
     <string name="confirm_route_question">Properly selected?</string>
-    <string name="confirm_route_end_question">End \nof Route?</string>
+    <string name="confirm_route_end_question">Route \nEnd?</string>
     <string name="yes_button">YES</string>
     <string name="no_button">NO</string>
 
