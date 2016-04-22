@@ -70,6 +70,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 // Send notification and log the transition details.
                 sendNotification(geofenceTransitionDetails);
 
+                Log.e(TAG , geofenceTransitionDetails);
+
                 // Edit() ROUTE_IN_PROGRESS - Set it to false
                 getSharedPreferences(SelectRouteActivity.PREFS_FILE, MODE_PRIVATE).edit().putBoolean(SelectRouteActivity.ROUTE_IN_PROGRESS, false).commit();
 
@@ -137,7 +139,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.mipmap.ic_launcher))
                 .setColor(Color.RED)
-                .setContentTitle(notificationDetails)
+                .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.geofence_transition_notification_text))
                 .setContentIntent(notificationPendingIntent)
                 .setDefaults(Notification.DEFAULT_SOUND |
